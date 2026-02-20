@@ -19,6 +19,7 @@
             flex-direction: column;
             align-items: center;
             padding: 20px 10px;
+            overflow-x: hidden;
         }
 
         /* 标题样式 */
@@ -30,30 +31,58 @@
             text-align: center;
         }
 
-        /* 中部超大展示方框（进一步放大） */
+        /* 中部超大透明展示框 */
         .display-container {
-            width: 96%;  /* 宽度再放大2% */
-            height: 580px; /* 高度再增加60px */
-            background-color: #FFFFFF;
+            width: 96%;
+            height: 580px;
+            background-color: rgba(255, 255, 255, 0.92);
             border: 3px solid #1890FF;
-            border-radius: 16px;
+            border-radius: 18px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 10px 0 20px;
-            box-shadow: 0 6px 12px rgba(24, 144, 255, 0.15);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            margin: 10px auto;
+            box-shadow: 0 8px 16px rgba(24, 144, 255, 0.18);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
         }
 
-        /* 中部字号大幅放大 */
+        /* 抽取过程单行显示样式 */
         .display-text {
-            font-size: 88px;  /* 字号再增大16px */
+            font-size: 90px;
             font-weight: bold;
             color: #1890FF;
             text-align: center;
-            padding: 20px;
-            line-height: 1.2;
+            line-height: 1.3;
+            letter-spacing: 2px;
+            display: none;
+        }
+
+        /* 抽取结果网格布局（每行最多10个，最多6列） */
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(calc(100%/6), 1fr)); /* 最多6列 */
+            gap: 15px;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .result-item {
+            background-color: #F0F7FF;
+            border: 2px solid #1890FF;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: #1890FF;
+            padding: 10px;
+            text-align: center;
+            word-break: break-all;
         }
 
         /* 参数配置区域 */
@@ -62,41 +91,52 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 25px;
-            margin: 10px 0 15px;
+            gap: 30px;
+            margin: 10px auto 20px;
             flex-wrap: wrap;
         }
 
         .config-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .config-label {
-            font-size: 22px;
+            font-size: 24px;
             color: #333333;
+            font-weight: 500;
         }
 
         .config-input {
-            padding: 10px 12px;
-            font-size: 20px;
+            padding: 12px 15px;
+            font-size: 22px;
             border: 2px solid #1890FF;
-            border-radius: 8px;
-            width: 110px;
+            border-radius: 10px;
+            width: 120px;
             outline: none;
             text-align: center;
+            transition: border-color 0.3s ease;
         }
 
         .config-input:focus {
             border-color: #40A9FF;
-            box-shadow: 0 0 8px rgba(64, 169, 255, 0.6);
+            box-shadow: 0 0 10px rgba(64, 169, 255, 0.5);
         }
 
         .switch-btn {
-            font-size: 22px;
+            font-size: 24px;
             color: #333333;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .switch-btn input {
+            width: 20px;
+            height: 20px;
+            accent-color: #1890FF;
         }
 
         /* 底部操作按钮区域（圆角边框包裹） */
@@ -105,35 +145,39 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
-            margin: 20px 0 10px;
+            gap: 25px;
+            margin: 20px auto 30px;
             background-color: #FFFFFF;
             border: 3px solid #1890FF;
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 25px;
+            padding: 25px;
             flex-wrap: wrap;
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.12);
         }
 
         .operation-btn {
-            padding: 15px 30px;
-            font-size: 22px;
+            padding: 16px 32px;
+            font-size: 24px;
             background-color: #1890FF;
             color: #FFFFFF;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 140px;
         }
 
         .operation-btn:hover {
             background-color: #40A9FF;
-            transform: translateY(-3px);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px rgba(64, 169, 255, 0.2);
         }
 
         .operation-btn:disabled {
             background-color: #91D5FF;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
         /* 后台管理弹窗样式 */
@@ -144,7 +188,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.55);
             z-index: 1000;
             justify-content: center;
             align-items: center;
@@ -153,81 +197,135 @@
         .modal-content {
             background-color: #FFFFFF;
             border-radius: 20px;
-            padding: 35px;
+            padding: 40px;
             width: 85%;
-            max-width: 850px;
+            max-width: 900px;
             max-height: 85vh;
             overflow-y: auto;
-            border: 2px solid #1890FF;
+            border: 3px solid #1890FF;
+            box-shadow: 0 8px 24px rgba(24, 144, 255, 0.2);
         }
 
         .modal-title {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: bold;
             color: #1890FF;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
             text-align: center;
         }
 
         .password-input {
             width: 100%;
-            padding: 12px;
-            font-size: 20px;
+            padding: 14px;
+            font-size: 22px;
             border: 2px solid #1890FF;
-            border-radius: 8px;
-            margin-bottom: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
             outline: none;
+        }
+
+        .password-input:focus {
+            border-color: #40A9FF;
+            box-shadow: 0 0 10px rgba(64, 169, 255, 0.5);
         }
 
         .prob-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin: 25px 0;
+            gap: 15px;
+            margin: 30px 0;
         }
 
         .prob-item {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 10px;
+            gap: 20px;
+            padding: 12px;
             border-bottom: 2px solid #E6F4FF;
+            background-color: #F8FBFF;
+            border-radius: 8px;
         }
 
         .prob-name {
-            font-size: 22px;
+            font-size: 24px;
             color: #333333;
-            width: 220px;
+            width: 240px;
+            font-weight: 500;
         }
 
         .prob-input {
             flex: 1;
-            padding: 10px;
-            font-size: 20px;
+            padding: 12px;
+            font-size: 22px;
             border: 2px solid #1890FF;
-            border-radius: 8px;
+            border-radius: 10px;
             outline: none;
             text-align: center;
+        }
+
+        .prob-input:focus {
+            border-color: #40A9FF;
+            box-shadow: 0 0 8px rgba(64, 169, 255, 0.4);
         }
 
         .modal-btn-group {
             display: flex;
             justify-content: center;
-            gap: 25px;
-            margin-top: 25px;
+            gap: 30px;
+            margin-top: 30px;
         }
 
         /* 响应式适配 */
+        @media (max-width: 992px) {
+            .display-text {
+                font-size: 70px;
+            }
+            .display-container {
+                height: 500px;
+            }
+            .result-item {
+                font-size: 24px;
+            }
+            .operation-btn {
+                padding: 14px 28px;
+                font-size: 20px;
+                min-width: 120px;
+            }
+            .config-label, .switch-btn {
+                font-size: 20px;
+            }
+            .config-input {
+                font-size: 18px;
+                width: 100px;
+            }
+        }
+
         @media (max-width: 768px) {
             .display-text {
-                font-size: 60px;
+                font-size: 50px;
             }
             .display-container {
                 height: 400px;
             }
+            .result-grid {
+                grid-template-columns: repeat(auto-fill, minmax(calc(100%/3), 1fr)); /* 移动端最多3列 */
+            }
+            .result-item {
+                font-size: 20px;
+            }
             .operation-btn {
-                padding: 12px 25px;
+                padding: 12px 24px;
                 font-size: 18px;
+                min-width: 100px;
+            }
+            .title {
+                font-size: 36px;
+            }
+            .modal-content {
+                padding: 25px;
+            }
+            .modal-title {
+                font-size: 24px;
             }
         }
     </style>
@@ -236,9 +334,12 @@
     <!-- 标题 -->
     <div class="title">课堂点名器</div>
 
-    <!-- 中部超大展示方框 -->
+    <!-- 中部超大透明展示框 -->
     <div class="display-container">
+        <!-- 抽取过程单行显示 -->
         <div class="display-text" id="displayText">请导入名单后开始抽取</div>
+        <!-- 抽取结果网格展示（每行最多10个，最多6列） -->
+        <div class="result-grid" id="resultGrid"></div>
     </div>
 
     <!-- 参数配置区域 -->
@@ -297,12 +398,17 @@
                 drawCount: 1,      // 默认抽取人数
                 replace: false     // 默认不放回
             },
-            adminPwd: "15086128049Fyy" // 后台密码
+            adminPwd: "15086128049Fyy", // 后台密码
+            resultConfig: {
+                maxPerRow: 10,     // 每行最多10个名字
+                maxColumns: 6      // 最多6列
+            }
         };
 
         // DOM元素获取
         const elements = {
             displayText: document.getElementById('displayText'),
+            resultGrid: document.getElementById('resultGrid'),
             drawTime: document.getElementById('drawTime'),
             drawCount: document.getElementById('drawCount'),
             replaceMode: document.getElementById('replaceMode'),
@@ -335,6 +441,8 @@
                 elements.drawCount.value = data.config.drawCount;
                 elements.replaceMode.checked = data.config.replace;
             }
+            // 默认显示单行文本，隐藏网格
+            showDisplayText();
         }
 
         // 保存配置到本地存储
@@ -343,7 +451,38 @@
             localStorage.setItem('callerConfig', JSON.stringify(data.config));
         }
 
-        // 导入名单处理
+        // 切换显示模式：单行文本（抽取过程）
+        function showDisplayText(text = '') {
+            elements.displayText.style.display = 'block';
+            elements.resultGrid.style.display = 'none';
+            if (text) elements.displayText.textContent = text;
+        }
+
+        // 切换显示模式：网格布局（抽取结果）
+        function showResultGrid(names = []) {
+            elements.displayText.style.display = 'none';
+            elements.resultGrid.style.display = 'grid';
+            // 清空网格
+            elements.resultGrid.innerHTML = '';
+            
+            if (names.length === 0) {
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'result-item';
+                emptyItem.textContent = '暂无抽取结果';
+                elements.resultGrid.appendChild(emptyItem);
+                return;
+            }
+
+            // 按规则生成网格项（每行最多10个，最多6列）
+            names.forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.textContent = name;
+                elements.resultGrid.appendChild(item);
+            });
+        }
+
+        // 导入名单处理（支持TXT/CSV，Excel需引入SheetJS）
         elements.importBtn.addEventListener('click', () => {
             elements.fileInput.click();
         });
@@ -353,88 +492,83 @@
             if (!file) return;
 
             try {
-                // 处理不同格式文件
-                if (file.name.endsWith('.txt')) {
-                    // 处理TXT文件
-                    const text = await file.text();
-                    data.nameList = text.split('\n')
-                        .map(line => line.trim())
-                        .filter(name => name);
-                } else if (file.name.endsWith('.csv')) {
-                    // 处理CSV文件
-                    const text = await file.text();
-                    data.nameList = text.split('\n')
-                        .map(line => line.split(',')[0].trim())
-                        .filter(name => name);
-                } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                    alert('Excel文件需引入SheetJS库支持，建议使用TXT/CSV格式！');
-                    return;
+                let textContent = '';
+                // 读取文件内容
+                if (file.type.includes('text') || file.name.endsWith('.csv') || file.name.endsWith('.txt')) {
+                    textContent = await file.text();
                 } else {
-                    alert('不支持的文件格式！请选择TXT/CSV/XLSX文件');
+                    alert('暂不支持该文件格式！推荐使用TXT/CSV格式（每行1个姓名）');
                     return;
                 }
 
-                // 初始化新导入人员的概率
-                initProbabilities();
-                // 保存配置
+                // 解析名单（过滤空行、多余空格）
+                data.nameList = textContent.split(/\r?\n/)
+                    .map(line => line.trim().replace(/,/g, '')) // 移除CSV的逗号
+                    .filter(name => name && name.length > 0);
+
+                if (data.nameList.length === 0) {
+                    alert('未识别到有效姓名！请检查名单格式（每行1个姓名）');
+                    return;
+                }
+
+                // 初始化新导入人员的概率（默认1.0）
+                data.nameList.forEach(name => {
+                    if (!data.probabilities[name]) {
+                        data.probabilities[name] = 1.0;
+                    }
+                });
+                // 清理已删除人员的概率配置
+                Object.keys(data.probabilities).forEach(name => {
+                    if (!data.nameList.includes(name)) {
+                        delete data.probabilities[name];
+                    }
+                });
+
+                // 保存配置并提示
                 saveConfig();
-                // 更新显示
-                updateDisplay(`成功导入 ${data.nameList.length} 人名单！`);
-                alert(`成功导入 ${data.nameList.length} 人名单！`);
+                showDisplayText(`成功导入 ${data.nameList.length} 人名单！`);
+                alert(`✅ 成功导入 ${data.nameList.length} 人名单`);
 
             } catch (error) {
-                alert(`导入失败：${error.message}`);
-                console.error(error);
+                alert(`❌ 导入失败：${error.message}`);
+                console.error('导入错误：', error);
             }
 
-            // 清空文件输入
+            // 清空文件输入，避免重复导入
             elements.fileInput.value = '';
         });
 
-        // 初始化人员概率（新导入的人员默认概率1.0）
-        function initProbabilities() {
-            data.nameList.forEach(name => {
-                if (!data.probabilities[name]) {
-                    data.probabilities[name] = 1.0;
-                }
-            });
-            // 移除已删除人员的概率配置
-            Object.keys(data.probabilities).forEach(name => {
-                if (!data.nameList.includes(name)) {
-                    delete data.probabilities[name];
-                }
-            });
-        }
-
-        // 开始抽取
+        // 开始抽取逻辑
         elements.startBtn.addEventListener('click', () => {
-            // 验证名单
+            // 验证名单是否存在
             if (data.nameList.length === 0) {
                 alert('请先导入人员名单！');
                 return;
             }
 
-            // 更新配置
-            data.config.drawTime = parseFloat(elements.drawTime.value);
-            data.config.drawCount = parseInt(elements.drawCount.value);
-            data.config.replace = elements.replaceMode.checked;
+            // 解析并验证参数
+            const drawTime = parseFloat(elements.drawTime.value);
+            const drawCount = parseInt(elements.drawCount.value);
+            const replaceMode = elements.replaceMode.checked;
 
-            // 验证参数
-            if (isNaN(data.config.drawTime) || data.config.drawTime < 0.5) {
-                alert('抽取时间需大于等于0.5秒！');
+            if (isNaN(drawTime) || drawTime < 0.5) {
+                alert('抽取时间需≥0.5秒！');
                 return;
             }
-            if (isNaN(data.config.drawCount) || data.config.drawCount < 1) {
-                alert('抽取人数需大于等于1！');
+            if (isNaN(drawCount) || drawCount < 1) {
+                alert('抽取人数需≥1！');
                 return;
             }
-            // 验证不放回模式下的人数限制
-            if (!data.config.replace && data.config.drawCount > data.nameList.length) {
+            // 不放回模式下人数不能超过名单总数
+            if (!replaceMode && drawCount > data.nameList.length) {
                 alert(`不放回模式下，抽取人数不能超过名单总数（${data.nameList.length}人）！`);
                 return;
             }
 
-            // 保存配置
+            // 更新配置并保存
+            data.config.drawTime = drawTime;
+            data.config.drawCount = drawCount;
+            data.config.replace = replaceMode;
             saveConfig();
 
             // 设置抽取状态
@@ -442,14 +576,14 @@
             elements.startBtn.disabled = true;
             elements.stopBtn.disabled = false;
 
-            // 开始滚动抽取
+            // 开始滚动抽取（透明化过程）
             startRolling();
 
-            // 设置最终抽取定时器
+            // 定时停止并显示结果
             data.drawTimer = setTimeout(() => {
                 stopRolling();
                 drawFinalResult();
-            }, data.config.drawTime * 1000);
+            }, drawTime * 1000);
         });
 
         // 停止抽取
@@ -459,7 +593,7 @@
             data.isDrawing = false;
             elements.startBtn.disabled = false;
             elements.stopBtn.disabled = true;
-            updateDisplay('抽取已停止');
+            showDisplayText('抽取已停止');
         });
 
         // 重置结果
@@ -469,16 +603,16 @@
             data.isDrawing = false;
             elements.startBtn.disabled = false;
             elements.stopBtn.disabled = true;
-            updateDisplay('请导入名单后开始抽取');
+            showDisplayText('请导入名单后开始抽取');
         });
 
         // 开始滚动显示（透明化抽取过程）
         function startRolling() {
-            // 每80ms刷新一次，滚动更流畅
+            // 70ms刷新一次，滚动更流畅
             data.drawInterval = setInterval(() => {
                 const randomName = getRandomNameByProb();
-                updateDisplay(randomName);
-            }, 80);
+                showDisplayText(randomName);
+            }, 70);
         }
 
         // 停止滚动
@@ -489,7 +623,7 @@
             }
         }
 
-        // 按概率随机选择姓名
+        // 按概率加权随机选择姓名
         function getRandomNameByProb(nameList = data.nameList) {
             // 计算总概率
             let totalProb = 0;
@@ -503,58 +637,50 @@
                 nameArray.push(name);
             });
 
-            // 随机选择
+            // 处理空名单/总概率为0的情况
+            if (nameArray.length === 0) return '暂无名单';
+            if (totalProb <= 0) return nameArray[Math.floor(Math.random() * nameArray.length)];
+
+            // 加权随机选择
             const random = Math.random() * totalProb;
-            let current = 0;
+            let currentProb = 0;
             for (let i = 0; i < nameArray.length; i++) {
-                current += probArray[i];
-                if (random <= current) {
+                currentProb += probArray[i];
+                if (random <= currentProb) {
                     return nameArray[i];
                 }
             }
-            return nameArray[0] || '暂无名单';
+            return nameArray[0];
         }
 
-        // 抽取最终结果（直接弹窗显示名单，无多余文字）
+        // 抽取最终结果（网格布局展示，无弹窗）
         function drawFinalResult() {
             const result = [];
-            let tempList = [...data.nameList];
+            let tempList = [...data.nameList]; // 复制名单用于不放回抽取
 
+            // 按设定人数抽取
             for (let i = 0; i < data.config.drawCount; i++) {
                 if (tempList.length === 0) break;
 
-                // 按概率抽取
-                const selected = getRandomNameByProb(tempList);
-                result.push(selected);
+                const selectedName = getRandomNameByProb(tempList);
+                result.push(selectedName);
 
-                // 不放回则移除
+                // 不放回模式下移除已抽中人员
                 if (!data.config.replace) {
-                    tempList = tempList.filter(name => name !== selected);
+                    tempList = tempList.filter(name => name !== selectedName);
                 }
             }
 
-            // 直接弹窗显示抽中名单（无任何多余文字）
-            if (result.length > 0) {
-                alert(result.join('\n'));
-                // 中部展示框显示最后一个抽中名字（也可改为清空）
-                updateDisplay(result[result.length - 1]);
-            } else {
-                alert('暂无抽取结果');
-                updateDisplay('请导入名单后开始抽取');
-            }
+            // 按网格布局显示结果（每行最多10个，最多6列）
+            showResultGrid(result);
 
-            // 重置状态
+            // 重置抽取状态
             data.isDrawing = false;
             elements.startBtn.disabled = false;
             elements.stopBtn.disabled = true;
         }
 
-        // 更新显示文本
-        function updateDisplay(text) {
-            elements.displayText.textContent = text;
-        }
-
-        // 后台管理弹窗
+        // 后台管理弹窗逻辑
         elements.adminBtn.addEventListener('click', () => {
             // 重置弹窗状态
             elements.modalTitle.textContent = '后台验证';
@@ -572,15 +698,22 @@
             elements.adminModal.style.display = 'none';
         });
 
+        // 点击弹窗外区域关闭
+        elements.adminModal.addEventListener('click', (e) => {
+            if (e.target === elements.adminModal) {
+                elements.adminModal.style.display = 'none';
+            }
+        });
+
         // 验证后台密码
         elements.confirmPwdBtn.addEventListener('click', () => {
-            const inputPwd = elements.adminPwd.value;
+            const inputPwd = elements.adminPwd.value.trim();
             if (inputPwd !== data.adminPwd) {
-                alert('密码错误！');
+                alert('❌ 密码错误！');
                 return;
             }
 
-            // 密码正确，显示概率设置界面
+            // 密码正确，切换到概率设置界面
             elements.modalTitle.textContent = '人员抽取概率设置';
             elements.adminPwd.style.display = 'none';
             elements.confirmPwdBtn.style.display = 'none';
@@ -591,50 +724,63 @@
         // 渲染概率设置列表
         function renderProbList() {
             if (data.nameList.length === 0) {
-                elements.probList.innerHTML = '<div style="text-align:center; font-size:22px; color:#666;">暂无人员名单</div>';
+                elements.probList.innerHTML = `
+                    <div style="text-align:center; font-size:24px; color:#666; padding:20px;">
+                        暂无人员名单，请先导入！
+                    </div>
+                `;
                 elements.probList.style.display = 'block';
                 return;
             }
 
-            let html = '';
+            // 生成概率配置项
+            let probHtml = '';
             data.nameList.forEach(name => {
-                const prob = data.probabilities[name] || 1.0;
-                html += `
+                const probValue = data.probabilities[name] || 1.0;
+                probHtml += `
                     <div class="prob-item">
                         <div class="prob-name">${name}</div>
-                        <input type="number" class="prob-input" data-name="${name}" value="${prob}" min="0" step="0.1">
+                        <input 
+                            type="number" 
+                            class="prob-input" 
+                            data-name="${name}" 
+                            value="${probValue}" 
+                            min="0" 
+                            step="0.1"
+                        >
                     </div>
                 `;
             });
-            elements.probList.innerHTML = html;
+            elements.probList.innerHTML = probHtml;
             elements.probList.style.display = 'block';
         }
 
         // 保存概率设置
         elements.saveProbBtn.addEventListener('click', () => {
             const probInputs = elements.probList.querySelectorAll('.prob-input');
+            let isSuccess = true;
+
             probInputs.forEach(input => {
                 const name = input.dataset.name;
-                const prob = parseFloat(input.value);
-                if (!isNaN(prob) && prob >= 0) {
-                    data.probabilities[name] = prob;
+                const probValue = parseFloat(input.value);
+                // 验证概率值有效性
+                if (isNaN(probValue) || probValue < 0) {
+                    alert(`❌ ${name}的概率值无效！请输入≥0的数字`);
+                    isSuccess = false;
+                    return;
                 }
+                // 更新概率
+                data.probabilities[name] = probValue;
             });
 
-            // 保存配置
-            saveConfig();
-            alert('概率设置保存成功！');
-            elements.adminModal.style.display = 'none';
-        });
-
-        // 点击弹窗外区域关闭
-        elements.adminModal.addEventListener('click', (e) => {
-            if (e.target === elements.adminModal) {
+            if (isSuccess) {
+                saveConfig();
+                alert('✅ 概率设置保存成功！');
                 elements.adminModal.style.display = 'none';
             }
         });
 
-        // 初始化
+        // 初始化应用
         window.onload = init;
     </script>
 </body>
