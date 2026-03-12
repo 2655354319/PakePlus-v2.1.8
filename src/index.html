@@ -1,11 +1,683 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PakePlus</title>
-    </head>
-    <body>
-        Hello World
-    </body>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课堂点名器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e6f7ff 0%, #f0f8fb 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(103, 151, 189, 0.15);
+            padding: 30px;
+            margin: 20px auto;
+        }
+
+        /* 标题样式 */
+        .title {
+            text-align: center;
+            color: #2c5aa0;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        /* 抽取区域 */
+        .draw-area {
+            height: 400px;
+            background: rgba(245, 250, 255, 0.8);
+            border-radius: 12px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #d1e7f5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .draw-process {
+            font-size: 4rem;
+            color: #2c5aa0;
+            opacity: 0.8;
+            transition: all 0.1s ease;
+            user-select: none;
+        }
+
+        .draw-result {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .result-item {
+            background: rgba(44, 90, 160, 0.1);
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            color: #2c5aa0;
+            border: 1px solid #b8d4e9;
+            width: calc(10% - 15px);
+            max-width: 100px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(103, 151, 189, 0.1);
+        }
+
+        /* 参数设置区 */
+        .settings {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-item label {
+            color: #2c5aa0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .setting-item input {
+            padding: 8px 12px;
+            border: 1px solid #b8d4e9;
+            border-radius: 8px;
+            width: 100px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: #2c5aa0;
+        }
+
+        .setting-item select {
+            padding: 8px 12px;
+            border: 1px solid #b8d4e9;
+            border-radius: 8px;
+            width: 180px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: #2c5aa0;
+        }
+
+        /* 按钮区域 */
+        .btn-area {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #2c5aa0;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(44, 90, 160, 0.2);
+        }
+
+        .btn:hover {
+            background: #1e4278;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(44, 90, 160, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* 后台管理区 */
+        .admin-panel {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(245, 250, 255, 0.9);
+            border-radius: 12px;
+            border: 1px solid #d1e7f5;
+        }
+
+        .admin-title {
+            color: #2c5aa0;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #d1e7f5;
+            padding-bottom: 10px;
+        }
+
+        .admin-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .admin-form-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-form-item label {
+            color: #2c5aa0;
+            font-size: 1rem;
+            min-width: 100px;
+        }
+
+        .admin-form-item input, .admin-form-item select, .admin-form-item textarea {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #b8d4e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: #2c5aa0;
+        }
+
+        .admin-form-item textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .name-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #b8d4e9;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .name-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px dashed #d1e7f5;
+        }
+
+        .name-item:last-child {
+            border-bottom: none;
+        }
+
+        .name-item span {
+            color: #2c5aa0;
+            font-size: 1rem;
+        }
+
+        .name-item input {
+            width: 80px;
+            padding: 4px 8px;
+            border: 1px solid #b8d4e9;
+            border-radius: 4px;
+        }
+
+        /* 密码弹窗 */
+        .password-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .password-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .password-content input {
+            padding: 10px 15px;
+            border: 1px solid #b8d4e9;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 2rem;
+            }
+
+            .draw-area {
+                height: 300px;
+            }
+
+            .draw-process {
+                font-size: 2.5rem;
+            }
+
+            .result-item {
+                width: calc(20% - 15px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题 -->
+        <h1 class="title">课堂点名器</h1>
+
+        <!-- 参数设置 -->
+        <div class="settings">
+            <div class="setting-item">
+                <label for="draw-time">抽取时间(秒):</label>
+                <input type="number" id="draw-time" value="3.5" min="1" step="0.5">
+            </div>
+            <div class="setting-item">
+                <label for="draw-count">抽取人数:</label>
+                <input type="number" id="draw-count" value="1" min="1" max="60">
+            </div>
+            <div class="setting-item">
+                <label for="draw-mode">抽取方式:</label>
+                <select id="draw-mode">
+                    <option value="no-repeat">抽中不放回</option>
+                    <option value="repeat">抽中可放回</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 抽取区域 -->
+        <div class="draw-area">
+            <div class="draw-process" id="draw-process">点击开始抽取</div>
+            <div class="draw-result" id="draw-result"></div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="btn-area">
+            <button class="btn" id="start-draw">开始抽取</button>
+            <button class="btn" id="import-list">导入名单</button>
+            <button class="btn" id="clear-result">清空结果</button>
+            <button class="btn" id="open-admin">后台管理</button>
+        </div>
+
+        <!-- 后台管理面板 -->
+        <div class="admin-panel" id="admin-panel">
+            <h2 class="admin-title">后台管理</h2>
+            
+            <!-- 名单管理 -->
+            <div class="admin-form">
+                <div class="admin-form-item">
+                    <label>添加姓名:</label>
+                    <input type="text" id="add-name" placeholder="输入姓名，多个用逗号分隔">
+                    <button class="btn" id="btn-add-name">添加</button>
+                </div>
+                <div class="admin-form-item">
+                    <label>搜索姓名:</label>
+                    <input type="text" id="search-name" placeholder="输入姓名搜索">
+                    <button class="btn" id="btn-search-name">搜索</button>
+                </div>
+                <div class="admin-form-item">
+                    <label>批量导入:</label>
+                    <input type="file" id="file-import" accept=".txt,.csv,.xlsx,.xls">
+                    <button class="btn" id="btn-file-import">确认导入</button>
+                </div>
+            </div>
+
+            <!-- 名单列表（带概率调整） -->
+            <h3 style="color: #2c5aa0; margin: 10px 0;">人员名单（概率%）</h3>
+            <div class="name-list" id="name-list"></div>
+
+            <button class="btn" id="save-prob">保存概率设置</button>
+            <button class="btn" id="close-admin">关闭后台</button>
+        </div>
+    </div>
+
+    <!-- 密码弹窗 -->
+    <div class="password-modal" id="password-modal">
+        <div class="password-content">
+            <h3 style="color: #2c5aa0;">请输入后台密码</h3>
+            <input type="password" id="admin-pwd" placeholder="输入密码">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" id="confirm-pwd">确认</button>
+                <button class="btn" id="cancel-pwd">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 核心数据存储（本地存储）
+        let nameList = JSON.parse(localStorage.getItem('nameList')) || [];
+        let probSettings = JSON.parse(localStorage.getItem('probSettings')) || {};
+        
+        // DOM元素获取
+        const drawProcess = document.getElementById('draw-process');
+        const drawResult = document.getElementById('draw-result');
+        const drawTimeInput = document.getElementById('draw-time');
+        const drawCountInput = document.getElementById('draw-count');
+        const drawModeSelect = document.getElementById('draw-mode');
+        const startDrawBtn = document.getElementById('start-draw');
+        const importListBtn = document.getElementById('import-list');
+        const clearResultBtn = document.getElementById('clear-result');
+        const openAdminBtn = document.getElementById('open-admin');
+        const adminPanel = document.getElementById('admin-panel');
+        const passwordModal = document.getElementById('password-modal');
+        const adminPwdInput = document.getElementById('admin-pwd');
+        const confirmPwdBtn = document.getElementById('confirm-pwd');
+        const cancelPwdBtn = document.getElementById('cancel-pwd');
+        const addNameInput = document.getElementById('add-name');
+        const btnAddName = document.getElementById('btn-add-name');
+        const searchNameInput = document.getElementById('search-name');
+        const btnSearchName = document.getElementById('btn-search-name');
+        const fileImportInput = document.getElementById('file-import');
+        const btnFileImport = document.getElementById('btn-file-import');
+        const nameListEl = document.getElementById('name-list');
+        const saveProbBtn = document.getElementById('save-prob');
+        const closeAdminBtn = document.getElementById('close-admin');
+
+        // 初始化名单列表（后台）
+        function renderNameList(list = nameList) {
+            nameListEl.innerHTML = '';
+            if (list.length === 0) {
+                nameListEl.innerHTML = '<div style="color: #2c5aa0; text-align: center;">暂无人员名单</div>';
+                return;
+            }
+            list.forEach(name => {
+                const prob = probSettings[name] || 100; // 默认概率100%
+                const item = document.createElement('div');
+                item.className = 'name-item';
+                item.innerHTML = `
+                    <span>${name}</span>
+                    <div>
+                        <input type="number" class="prob-input" data-name="${name}" value="${prob}" min="0" max="100">
+                        <span>%</span>
+                    </div>
+                `;
+                nameListEl.appendChild(item);
+            });
+        }
+
+        // 初始化渲染
+        renderNameList();
+
+        // 密码验证
+        openAdminBtn.addEventListener('click', () => {
+            passwordModal.style.display = 'flex';
+            adminPwdInput.value = '';
+        });
+
+        confirmPwdBtn.addEventListener('click', () => {
+            const pwd = adminPwdInput.value.trim();
+            if (pwd === '15086128049Fyy') {
+                passwordModal.style.display = 'none';
+                adminPanel.style.display = 'block';
+                renderNameList();
+            } else {
+                alert('密码错误，请重新输入！');
+                adminPwdInput.value = '';
+            }
+        });
+
+        cancelPwdBtn.addEventListener('click', () => {
+            passwordModal.style.display = 'none';
+        });
+
+        // 关闭后台
+        closeAdminBtn.addEventListener('click', () => {
+            adminPanel.style.display = 'none';
+        });
+
+        // 添加姓名
+        btnAddName.addEventListener('click', () => {
+            const names = addNameInput.value.trim().split(',').map(n => n.trim()).filter(n => n);
+            if (names.length === 0) {
+                alert('请输入有效姓名！');
+                return;
+            }
+            names.forEach(name => {
+                if (!nameList.includes(name)) {
+                    nameList.push(name);
+                    // 新增姓名默认概率100%
+                    if (!probSettings[name]) {
+                        probSettings[name] = 100;
+                    }
+                }
+            });
+            localStorage.setItem('nameList', JSON.stringify(nameList));
+            addNameInput.value = '';
+            renderNameList();
+            alert(`成功添加 ${names.length} 个姓名！`);
+        });
+
+        // 搜索姓名
+        btnSearchName.addEventListener('click', () => {
+            const keyword = searchNameInput.value.trim().toLowerCase();
+            if (!keyword) {
+                renderNameList();
+                return;
+            }
+            const filteredList = nameList.filter(name => name.toLowerCase().includes(keyword));
+            renderNameList(filteredList);
+        });
+
+        // 导入文件
+        btnFileImport.addEventListener('click', () => {
+            const file = fileImportInput.files[0];
+            if (!file) {
+                alert('请选择要导入的文件！');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let content = e.target.result;
+                    // 处理不同格式
+                    let newNames = [];
+                    if (file.name.endsWith('.txt')) {
+                        newNames = content.split(/[\n,，;；\s]+/).map(n => n.trim()).filter(n => n);
+                    } else if (file.name.endsWith('.csv')) {
+                        newNames = content.split('\n').map(line => line.split(',')[0].trim()).filter(n => n);
+                    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                        alert('Excel文件请先转换为TXT/CSV格式后导入！');
+                        return;
+                    }
+                    
+                    // 去重并添加
+                    newNames.forEach(name => {
+                        if (!nameList.includes(name)) {
+                            nameList.push(name);
+                            if (!probSettings[name]) {
+                                probSettings[name] = 100;
+                            }
+                        }
+                    });
+                    localStorage.setItem('nameList', JSON.stringify(nameList));
+                    fileImportInput.value = '';
+                    renderNameList();
+                    alert(`成功导入 ${newNames.length} 个姓名！`);
+                } catch (err) {
+                    alert('文件解析失败：' + err.message);
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        });
+
+        // 保存概率设置
+        saveProbBtn.addEventListener('click', () => {
+            const probInputs = document.querySelectorAll('.prob-input');
+            probInputs.forEach(input => {
+                const name = input.dataset.name;
+                const prob = parseFloat(input.value);
+                if (!isNaN(prob) && prob >= 0 && prob <= 100) {
+                    probSettings[name] = prob;
+                } else {
+                    alert(`${name} 的概率设置无效，已重置为100%`);
+                    probSettings[name] = 100;
+                    input.value = 100;
+                }
+            });
+            localStorage.setItem('probSettings', JSON.stringify(probSettings));
+            alert('概率设置已保存！');
+        });
+
+        // 导入名单（主界面）
+        importListBtn.addEventListener('click', () => {
+            fileImportInput.click();
+        });
+
+        fileImportInput.addEventListener('change', () => {
+            btnFileImport.click();
+        });
+
+        // 清空结果
+        clearResultBtn.addEventListener('click', () => {
+            drawResult.style.display = 'none';
+            drawProcess.style.display = 'block';
+            drawProcess.textContent = '点击开始抽取';
+        });
+
+        // 核心抽取逻辑
+        startDrawBtn.addEventListener('click', () => {
+            if (nameList.length === 0) {
+                alert('暂无人员名单，请先导入/添加！');
+                return;
+            }
+
+            const drawTime = parseFloat(drawTimeInput.value) * 1000; // 转毫秒
+            const drawCount = parseInt(drawCountInput.value);
+            const drawMode = drawModeSelect.value;
+
+            // 验证参数
+            if (isNaN(drawTime) || drawTime < 1000) {
+                alert('抽取时间必须大于等于1秒！');
+                return;
+            }
+            if (isNaN(drawCount) || drawCount < 1) {
+                alert('抽取人数必须大于等于1！');
+                return;
+            }
+            if (drawMode === 'no-repeat' && drawCount > nameList.length) {
+                alert(`抽中不放回模式下，抽取人数不能超过总人数(${nameList.length})！`);
+                return;
+            }
+
+            // 禁用按钮防止重复点击
+            startDrawBtn.disabled = true;
+            drawResult.style.display = 'none';
+            drawProcess.style.display = 'block';
+
+            // 随机抽取动画
+            const startTime = Date.now();
+            const interval = setInterval(() => {
+                // 随机选一个名字显示
+                const randomIndex = Math.floor(Math.random() * nameList.length);
+                drawProcess.textContent = nameList[randomIndex];
+                
+                // 检查是否到达抽取时间
+                if (Date.now() - startTime >= drawTime) {
+                    clearInterval(interval);
+                    // 执行最终抽取
+                    drawFinalResult(drawCount, drawMode);
+                    startDrawBtn.disabled = false;
+                }
+            }, 50); // 50ms刷新一次，实现透明化快速切换效果
+        });
+
+        // 最终抽取结果计算
+        function drawFinalResult(count, mode) {
+            const result = [];
+            let tempList = [...nameList]; // 临时列表（用于不放回）
+
+            // 按概率加权抽取
+            for (let i = 0; i < count; i++) {
+                if (tempList.length === 0) break;
+
+                // 计算权重总和
+                let totalWeight = 0;
+                tempList.forEach(name => {
+                    totalWeight += probSettings[name] || 100;
+                });
+
+                // 随机数
+                const randomNum = Math.random() * totalWeight;
+                let currentWeight = 0;
+                let selectedName = '';
+
+                // 按权重选择
+                for (const name of tempList) {
+                    currentWeight += probSettings[name] || 100;
+                    if (currentWeight >= randomNum) {
+                        selectedName = name;
+                        break;
+                    }
+                }
+
+                result.push(selectedName);
+
+                // 不放回模式移除已选中
+                if (mode === 'no-repeat') {
+                    tempList = tempList.filter(name => name !== selectedName);
+                }
+            }
+
+            // 显示结果
+            drawProcess.style.display = 'none';
+            drawResult.style.display = 'flex';
+            drawResult.innerHTML = '';
+
+            result.forEach(name => {
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                item.textContent = name;
+                drawResult.appendChild(item);
+            });
+        }
+
+        // 页面关闭时自动保存
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('nameList', JSON.stringify(nameList));
+            localStorage.setItem('probSettings', JSON.stringify(probSettings));
+        });
+    </script>
+</body>
 </html>
